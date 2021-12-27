@@ -1,9 +1,9 @@
-import { TicTacToePage } from "./pages/home";
+import { HomePage } from "./pages/home";
 
 function App() {
   return (
     <div>
-      <TicTacToePage />
+      <HomePage />
     </div>
   );
 }

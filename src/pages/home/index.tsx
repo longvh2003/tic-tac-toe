@@ -1,5 +1,5 @@
-import { TicTacToe } from "../../components/home";
+import { Home } from "../../components/home";
 
-export const TicTacToePage = () => {
-  return <TicTacToe />;
+export const HomePage = () => {
+  return <Home />;
 };
