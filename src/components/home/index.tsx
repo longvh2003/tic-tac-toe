@@ -143,7 +143,7 @@ const WrapperContainer = styled.div`
     padding: 36px 0;
     div {
       border-right: 1px solid rgb(0 0 0 / 25%);
-      padding-right: 40px;
+      padding-right: 90px;
     }
     button {
       outline: none;
