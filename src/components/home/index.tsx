@@ -19,6 +19,7 @@ export const Home = () => {
   const [wordPerMin, setWordPerMin] = useState<number>(0);
   const [isStart, setStart] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
+  const [isOpenModal, setOpenModal] = useState<boolean>(false);
 
   useLayoutEffect(() => {
     setState({ ...innitValue, index: randomInterger(listParagraph.length) });
@@ -61,6 +62,8 @@ export const Home = () => {
         .filter((character) => character === " ").length;
       setWordPerMin(Math.floor((60 * finishWord) / (60 - timeLeft)));
     }
+    if (index === listParagraph[state.index].length - 1 || timeLeft === 0)
+      setOpenModal(true);
     // eslint-disable-next-line
   }, [timeLeft, index]);
 
@@ -76,6 +79,8 @@ export const Home = () => {
     setTimeLeft(60);
     setStart(false);
     setIndex(0);
+    setWordPerMin(0);
+    setCharacterPerMin(0);
     clearInterval(intervalTimer);
   };
 
@@ -84,12 +89,22 @@ export const Home = () => {
     return <span className={i < index ? "active" : ""}>{c}</span>;
   });
 
+  const messageTitle = () => {
+    if (wordPerMin < 40) {
+      return "u fuking bad bro(sis)!!!!";
+    } else if (wordPerMin > 100) {
+      return "ur parent proud of u!!";
+    } else {
+      return "well done my friend!";
+    }
+  };
+
   return (
     <Backgroud>
       <WrapperContainer>
         <div className="wrapper-content">
           <div className="content-info">{paragraphs}</div>
-          <div className="action">
+          <div className="content-result">
             <div>Time Left: {timeLeft}</div>
             <div>Mistakes: {state.misTakes}</div>
             <div>WPM: {wordPerMin}</div>
@@ -98,6 +113,20 @@ export const Home = () => {
           </div>
         </div>
       </WrapperContainer>
+      {isOpenModal && (
+        <Modal>
+          <div className="title-popup">congrats! {messageTitle()}</div>
+          <div className="result">
+            <div>Here is ur result:</div>
+            <div>Mistakes: {state.misTakes}</div>
+            <div>Words per minute: {wordPerMin}</div>
+            <div>Characters per minute: {characterPerMin}</div>
+          </div>
+          <div className="action">
+            <button onClick={() => setOpenModal(false)}>OK</button>
+          </div>
+        </Modal>
+      )}
     </Backgroud>
   );
 };
@@ -109,8 +138,9 @@ const Backgroud = styled.div`
 
 const WrapperContainer = styled.div`
   background-color: white;
-  width: 70vw;
-  height: 40vh;
+  min-width: 800px;
+  with: 70%;
+  height: 350px;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -119,6 +149,7 @@ const WrapperContainer = styled.div`
   border-radius: 10px;
   padding: 20px;
   font-size: 22px;
+  z-index: 9;
   .wrapper-content {
     height: 94%;
     border: 1px solid rgb(0 0 0 / 25%);
@@ -137,13 +168,13 @@ const WrapperContainer = styled.div`
       text-decoration: underline;
     }
   }
-  .action {
+  .content-result {
     display: flex;
     justify-content: space-around;
     padding: 36px 0;
     div {
       border-right: 1px solid rgb(0 0 0 / 25%);
-      padding-right: 90px;
+      padding-right: 36px;
     }
     button {
       outline: none;
@@ -151,6 +182,41 @@ const WrapperContainer = styled.div`
       background-color: #d7dbc1;
       border-radius: 5px;
       padding: 10px;
+      cursor: pointer;
+    }
+  }
+`;
+
+const Modal = styled.div`
+  width: 500px;
+  height: 250px;
+  position: absolute;
+  z-index: 99;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgb(0 0 0 / 25%);
+  background-color: white;
+  border-radius: 10px;
+  .title-popup {
+    text-transform: uppercase;
+    font-weight: 500;
+    margin: 30px 0 0 105px;
+  }
+  .result {
+    margin: 30px 0 0 105px;
+  }
+  .action {
+    text-align: center;
+    margin-top: 25px;
+    button {
+      width: 100px;
+      height: 30px;
+      border: none;
+      outline: none;
+      border-radius: 5px;
+      background-color: #d7dbc1;
+      cursor: pointer;
     }
   }
 `;
