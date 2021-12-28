@@ -59,7 +59,7 @@ export const Home = () => {
         .slice(0, index + 1)
         .split("")
         .filter((character) => character === " ").length;
-      setWordPerMin(finishWord);
+      setWordPerMin(Math.floor((60 * finishWord) / (60 - timeLeft)));
     }
     // eslint-disable-next-line
   }, [timeLeft, index]);
@@ -129,6 +129,7 @@ const WrapperContainer = styled.div`
     padding: 10px 10px 40px;
     border-bottom: 1px solid rgb(0 0 0 / 25%);
     color: rgb(0 0 0 / 25%);
+    height: 56%;
     .active {
       color: black;
     }
