@@ -25,40 +25,51 @@ export const Home = () => {
   }, []);
 
   const handlerKeyDown = (event) => {
-    if((event.keyCode >= 65 && event.keyCode <= 105) || (event.keyCode >= 186 && event.keyCode <= 192) || event.keyCode === 32 || event.keyCode === 220 || event.keyCode === 222 || event.keyCode === 231){
-      if(!isStart) {
+    if (
+      (event.keyCode >= 65 && event.keyCode <= 105) ||
+      (event.keyCode >= 186 && event.keyCode <= 192) ||
+      event.keyCode === 32 ||
+      event.keyCode === 220 ||
+      event.keyCode === 222 ||
+      event.keyCode === 231
+    ) {
+      if (!isStart) {
         setStart(true);
-        intervalTimer = setInterval(()=>{
-          setTimeLeft(prev => {
-            if(prev === 1) {
+        intervalTimer = setInterval(() => {
+          setTimeLeft((prev) => {
+            if (prev === 1) {
               clearInterval(intervalTimer);
             }
             return prev - 1;
           });
-        }, 1000)
+        }, 1000);
       }
-      if(event.key === listParagraph[state.index].split('')[index]) {
+      if (event.key === listParagraph[state.index].split("")[index]) {
         setIndex(index + 1);
       } else {
-        setState({...state, misTakes: state.misTakes + 1})
+        setState({ ...state, misTakes: state.misTakes + 1 });
       }
     }
-  }
+  };
 
   useEffect(() => {
-    if(timeLeft < 60){
-      setCharacterPerMin(Math.floor(60 * index / (60 - timeLeft)))
-      const finishWord = listParagraph[state.index].slice(0, index + 1).split('').filter(character => character === ' ').length;
+    if (timeLeft < 60) {
+      setCharacterPerMin(Math.floor((60 * index) / (60 - timeLeft)));
+      const finishWord = listParagraph[state.index]
+        .slice(0, index + 1)
+        .split("")
+        .filter((character) => character === " ").length;
       setWordPerMin(finishWord);
-    } 
-  }, [timeLeft, index])
+    }
+    // eslint-disable-next-line
+  }, [timeLeft, index]);
 
   useEffect(() => {
-    if (timeLeft > 0) window.addEventListener('keydown', handlerKeyDown);
+    if (timeLeft > 0) window.addEventListener("keydown", handlerKeyDown);
     return () => {
-      window.removeEventListener('keydown', handlerKeyDown);
-    }}
-  )
+      window.removeEventListener("keydown", handlerKeyDown);
+    };
+  });
 
   const tryAgain = () => {
     setState({ ...innitValue, index: randomInterger(listParagraph.length) });
@@ -68,10 +79,10 @@ export const Home = () => {
     clearInterval(intervalTimer);
   };
 
-  const paragraphs = listParagraph[state.index].split('').map((c, i)=>{
-    if(i === index) return <span className="underline">{c}</span>
-    return <span className={i < index ? 'active' : ''}>{c}</span>
-  })
+  const paragraphs = listParagraph[state.index].split("").map((c, i) => {
+    if (i === index) return <span className="underline">{c}</span>;
+    return <span className={i < index ? "active" : ""}>{c}</span>;
+  });
 
   return (
     <Backgroud>
@@ -93,7 +104,7 @@ export const Home = () => {
 
 const Backgroud = styled.div`
   height: 100vh;
-  background-color: #D7DBC1;
+  background-color: #d7dbc1;
 `;
 
 const WrapperContainer = styled.div`
@@ -108,35 +119,35 @@ const WrapperContainer = styled.div`
   border-radius: 10px;
   padding: 20px;
   font-size: 22px;
-  .wrapper-content{
+  .wrapper-content {
     height: 94%;
     border: 1px solid rgb(0 0 0 / 25%);
     padding: 10px;
     border-radius: 10px;
   }
-  .content-info{
+  .content-info {
     padding: 10px 10px 40px;
     border-bottom: 1px solid rgb(0 0 0 / 25%);
     color: rgb(0 0 0 / 25%);
-    .active{
+    .active {
       color: black;
     }
-    .underline{
+    .underline {
       text-decoration: underline;
     }
   }
-  .action{
+  .action {
     display: flex;
     justify-content: space-around;
     padding: 36px 0;
-    div{
+    div {
       border-right: 1px solid rgb(0 0 0 / 25%);
       padding-right: 40px;
     }
-    button{
+    button {
       outline: none;
       border: none;
-      background-color: #D7DBC1;
+      background-color: #d7dbc1;
       border-radius: 5px;
       padding: 10px;
     }

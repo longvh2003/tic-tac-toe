@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@types/react": "^17.0.37",
-    "@types/styled-components": "^5.1.19"
+    "@types/styled-components": "^5.1.19",
+    "eslint-plugin-react-hooks": "^4.3.0"
   }
 }
