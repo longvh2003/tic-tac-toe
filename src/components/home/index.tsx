@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { listParagraph } from "../common";
 import {
@@ -6,6 +6,10 @@ import {
   SettingOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
+import { Slider } from "antd";
+import "antd/dist/antd.css";
+
+const music = require("../../shared/music/KissMeMore.mp3");
 
 const randomInterger = (maxNumber: number) => {
   return Math.floor(Math.random() * maxNumber);
@@ -26,7 +30,9 @@ export const Home = () => {
   const [index, setIndex] = useState<number>(0);
   const [isOpenModal, setOpenModal] = useState<boolean>(false);
   const [isOpenTutorial, setOpenTutorial] = useState<boolean>(false);
+  const [isOpenSettings, setOpenSettings] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useLayoutEffect(() => {
     setState({ ...innitValue, index: randomInterger(listParagraph.length) });
@@ -34,12 +40,14 @@ export const Home = () => {
 
   const handlerKeyDown = (event) => {
     if (
-      (event.keyCode >= 65 && event.keyCode <= 105) ||
-      (event.keyCode >= 186 && event.keyCode <= 192) ||
-      event.keyCode === 32 ||
-      event.keyCode === 220 ||
-      event.keyCode === 222 ||
-      event.keyCode === 231
+      !isOpenSettings &&
+      !isOpenTutorial &&
+      ((event.keyCode >= 65 && event.keyCode <= 105) ||
+        (event.keyCode >= 186 && event.keyCode <= 192) ||
+        event.keyCode === 32 ||
+        event.keyCode === 220 ||
+        event.keyCode === 222 ||
+        event.keyCode === 231)
     ) {
       if (!isStart) {
         setStart(true);
@@ -107,17 +115,36 @@ export const Home = () => {
     }
   };
 
+  const handleChangeVolume = (value: number) => {
+    if (audioRef.current) audioRef.current.volume = value / 10;
+  };
+
   return (
     <Backgroud>
+      {isStart && (
+        <WrapperAudio>
+          <audio id="audio" controls autoPlay ref={audioRef}>
+            <source src={music.default} type="audio/mpeg" />
+          </audio>
+        </WrapperAudio>
+      )}
       <Tutorial>
         <div
           className="question"
-          id="question"
-          onClick={() => setOpenTutorial(true)}
+          onClick={() => {
+            setOpenTutorial(true);
+            setOpenSettings(false);
+          }}
         >
           <QuestionCircleOutlined style={{ fontSize: 32 }} />
         </div>
-        <div className="setting">
+        <div
+          className="setting"
+          onClick={() => {
+            setOpenSettings(true);
+            setOpenTutorial(false);
+          }}
+        >
           <SettingOutlined style={{ fontSize: 32 }} />
         </div>
       </Tutorial>
@@ -152,6 +179,7 @@ export const Home = () => {
         <TutorialModal>
           <CloseCircleOutlined onClick={() => setOpenTutorial(false)} />
           <div className="container">
+            <div className="tutorial-title">Tutorial</div>
             <div className="title-tutorial">What is a typing test?</div>
             <div className="content-tutorial">
               A typing test is a practical test that measures your typing speed
@@ -174,6 +202,23 @@ export const Home = () => {
           </div>
         </TutorialModal>
       )}
+      {isOpenSettings && (
+        <SettingModal>
+          <CloseCircleOutlined onClick={() => setOpenSettings(false)} />
+          <div className="wrapper-setting">
+            <div className="setting-title">Setting</div>
+            <div className="setting-component">
+              <div>Volumn</div>
+              <Slider
+                defaultValue={3}
+                min={0}
+                max={10}
+                onChange={(value) => handleChangeVolume(value)}
+              />
+            </div>
+          </div>
+        </SettingModal>
+      )}
     </Backgroud>
   );
 };
@@ -181,6 +226,10 @@ export const Home = () => {
 const Backgroud = styled.div`
   height: 100vh;
   background-color: #d7dbc1;
+`;
+
+const WrapperAudio = styled.div`
+  opacity: 0;
 `;
 
 const Tutorial = styled.div`
@@ -197,9 +246,9 @@ const Tutorial = styled.div`
 
 const WrapperContainer = styled.div`
   background-color: white;
-  min-width: 800px;
+  min-width: 900px;
   with: 70%;
-  height: 350px;
+  height: 450px;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -219,7 +268,8 @@ const WrapperContainer = styled.div`
     padding: 10px 10px 40px;
     border-bottom: 1px solid rgb(0 0 0 / 25%);
     color: rgb(0 0 0 / 25%);
-    height: 56%;
+    height: 72%;
+
     .active {
       color: black;
     }
@@ -248,7 +298,7 @@ const WrapperContainer = styled.div`
 
 const Modal = styled.div`
   width: 500px;
-  height: 250px;
+  height: 270px;
   position: absolute;
   z-index: 99;
   top: 50%;
@@ -304,6 +354,11 @@ const TutorialModal = styled.div`
   }
   .container {
     padding: 30px 40px 30px;
+    .tutorial-title {
+      text-align: center;
+      font-weight: 500;
+      font-size: 24px;
+    }
     .title-tutorial,
     .footer-tutorial {
       text-align: center;
@@ -319,7 +374,43 @@ const TutorialModal = styled.div`
       }
     }
     .footer-tutorial {
+      margin-top: 30px;
+    }
+  }
+`;
+
+const SettingModal = styled.div`
+  width: 500px;
+  height: 500px;
+  position: absolute;
+  z-index: 999;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgb(0 0 0 / 25%);
+  background-color: white;
+  border-radius: 10px;
+  .anticon-close-circle {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 22px;
+    cursor: pointer;
+  }
+  .wrapper-setting {
+    padding: 40px 40px 30px;
+    .setting-title {
+      text-align: center;
+      font-weight: 500;
+      font-size: 24px;
+    }
+    .setting-component {
       margin-top: 40px;
+      display: flex;
+      .ant-slider {
+        width: 50%;
+        margin: 7px 0 0 20px;
+      }
     }
   }
 `;
