@@ -8,6 +8,9 @@ import {
 } from "@ant-design/icons";
 import { Slider } from "antd";
 import "antd/dist/antd.css";
+import { GameOverModal } from "./modal/GameOver";
+import { TutorialModal } from "./modal/TutorialModal";
+import { SettingModal } from "./modal/SettingModal";
 
 const music = require("../../shared/music/KissMeMore.mp3");
 
@@ -21,8 +24,13 @@ const innitValue = {
 };
 let intervalTimer;
 
+export interface StateProps {
+  index: number;
+  misTakes: number;
+}
+
 export const Home = () => {
-  const [state, setState] = useState(innitValue);
+  const [state, setState] = useState<StateProps>(innitValue);
   const [timeLeft, setTimeLeft] = useState<number>(60);
   const [characterPerMin, setCharacterPerMin] = useState<number>(0);
   const [wordPerMin, setWordPerMin] = useState<number>(0);
@@ -32,6 +40,7 @@ export const Home = () => {
   const [isOpenTutorial, setOpenTutorial] = useState<boolean>(false);
   const [isOpenSettings, setOpenSettings] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
+  const [volume, setVolume] = useState<number>(5);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useLayoutEffect(() => {
@@ -105,20 +114,6 @@ export const Home = () => {
     return <span className={i < index ? "active" : ""}>{c}</span>;
   });
 
-  const messageTitle = () => {
-    if (score < 70) {
-      return "u fuking bad bro(sis)!!!!";
-    } else if (wordPerMin > 170) {
-      return "ur parent proud of u!!";
-    } else {
-      return "well done my friend!";
-    }
-  };
-
-  const handleChangeVolume = (value: number) => {
-    if (audioRef.current) audioRef.current.volume = value / 10;
-  };
-
   return (
     <Backgroud>
       {isStart && (
@@ -160,65 +155,25 @@ export const Home = () => {
           </div>
         </div>
       </WrapperContainer>
-      {isOpenModal && (
-        <Modal>
-          <div className="title-popup">congrats! {messageTitle()}</div>
-          <div className="result">
-            <div>Here is ur result:</div>
-            <div>Mistakes: {state.misTakes}</div>
-            <div>Words per minute: {wordPerMin}</div>
-            <div>Characters per minute: {characterPerMin}</div>
-            <div className="score">Ur score: {score}</div>
-          </div>
-          <div className="action">
-            <button onClick={() => setOpenModal(false)}>OK</button>
-          </div>
-        </Modal>
-      )}
-      {isOpenTutorial && (
-        <TutorialModal>
-          <CloseCircleOutlined onClick={() => setOpenTutorial(false)} />
-          <div className="container">
-            <div className="tutorial-title">Tutorial</div>
-            <div className="title-tutorial">What is a typing test?</div>
-            <div className="content-tutorial">
-              A typing test is a practical test that measures your typing speed
-              and accuracy while working with an actual passage of text. While
-              tests vary, you're typically given a set piece of writing and a
-              set time to complete it within. Your test results look at four
-              scores, the number of character you can type per minute, known as
-              CPM or chracters-per-minute, the number of words you can type per
-              minute, known as WPM or words-per-minute, the number of errors you
-              have made in the text, and finally your score.
-            </div>
-            <div className="title-tutorial">How to calculate ur score?</div>
-            <div className="content-tutorial">
-              <ul>
-                <li>2 points for per word u finished.</li>
-                <li>-1 point for per mistake u made.</li>
-              </ul>
-            </div>
-            <div className="footer-tutorial">Good Luck!!!</div>
-          </div>
-        </TutorialModal>
-      )}
-      {isOpenSettings && (
-        <SettingModal>
-          <CloseCircleOutlined onClick={() => setOpenSettings(false)} />
-          <div className="wrapper-setting">
-            <div className="setting-title">Setting</div>
-            <div className="setting-component">
-              <div>Volumn</div>
-              <Slider
-                defaultValue={3}
-                min={0}
-                max={10}
-                onChange={(value) => handleChangeVolume(value)}
-              />
-            </div>
-          </div>
-        </SettingModal>
-      )}
+      <GameOverModal
+        state={state}
+        wordPerMin={wordPerMin}
+        characterPerMin={characterPerMin}
+        score={score}
+        isOpenModal={isOpenModal}
+        setOpenModal={setOpenModal}
+      />
+      <TutorialModal
+        isOpenTutorial={isOpenTutorial}
+        setOpenTutorial={setOpenTutorial}
+      />
+      <SettingModal
+        isOpenSettings={isOpenSettings}
+        setOpenSettings={setOpenSettings}
+        audioRef={audioRef}
+        volume={volume}
+        setVolume={setVolume}
+      />
     </Backgroud>
   );
 };
@@ -292,125 +247,6 @@ const WrapperContainer = styled.div`
       border-radius: 5px;
       padding: 10px;
       cursor: pointer;
-    }
-  }
-`;
-
-const Modal = styled.div`
-  width: 500px;
-  height: 270px;
-  position: absolute;
-  z-index: 99;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 1px solid rgb(0 0 0 / 25%);
-  background-color: white;
-  border-radius: 10px;
-  .title-popup {
-    text-transform: uppercase;
-    font-weight: 500;
-    margin: 30px 0 0 105px;
-  }
-  .result {
-    margin: 30px 0 0 105px;
-    .score {
-      color: #e14f4f;
-      font-weight: 500;
-    }
-  }
-  .action {
-    text-align: center;
-    margin-top: 25px;
-    button {
-      width: 100px;
-      height: 30px;
-      border: none;
-      outline: none;
-      border-radius: 5px;
-      background-color: #d7dbc1;
-      cursor: pointer;
-    }
-  }
-`;
-
-const TutorialModal = styled.div`
-  width: 500px;
-  height: 500px;
-  position: absolute;
-  z-index: 999;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 1px solid rgb(0 0 0 / 25%);
-  background-color: white;
-  border-radius: 10px;
-  .anticon-close-circle {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    font-size: 22px;
-    cursor: pointer;
-  }
-  .container {
-    padding: 30px 40px 30px;
-    .tutorial-title {
-      text-align: center;
-      font-weight: 500;
-      font-size: 24px;
-    }
-    .title-tutorial,
-    .footer-tutorial {
-      text-align: center;
-      font-weight: 500;
-    }
-    .title-tutorial {
-      margin-top: 20px;
-    }
-    .content-tutorial {
-      margin-top: 20px;
-      ul {
-        margin-left: -20px;
-      }
-    }
-    .footer-tutorial {
-      margin-top: 30px;
-    }
-  }
-`;
-
-const SettingModal = styled.div`
-  width: 500px;
-  height: 500px;
-  position: absolute;
-  z-index: 999;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 1px solid rgb(0 0 0 / 25%);
-  background-color: white;
-  border-radius: 10px;
-  .anticon-close-circle {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    font-size: 22px;
-    cursor: pointer;
-  }
-  .wrapper-setting {
-    padding: 40px 40px 30px;
-    .setting-title {
-      text-align: center;
-      font-weight: 500;
-      font-size: 24px;
-    }
-    .setting-component {
-      margin-top: 40px;
-      display: flex;
-      .ant-slider {
-        width: 50%;
-        margin: 7px 0 0 20px;
-      }
     }
   }
 `;
